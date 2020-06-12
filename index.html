@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>G20 Expenditures</title>
+        <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://www.gstatic.com/charts/loader.js"></script>
+        <script>
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawAllSheets);
+
+            function drawAllSheets() {
+            drawSheetName('bubblechart', 'SELECT A,B,C,D,E', bubbleChartResponseHandler);
+            drawSheetName('educ_share', 'SELECT A,B', topSharedGDPResponseHandler);
+            drawSheetName('bubblechart_mil', 'SELECT A,B,C,D,E', bubbleChartMilResponseHandler);
+            drawSheetName('military_share', 'SELECT A,B', topSharedMilitaryResponseHandler);
+            drawSheetName('health_share', 'SELECT A,B', topHealthSpendingResponseHandler);
+            drawSheetName('health_gdp', 'SELECT A,B,C', healthSpendingResponseHandler);
+            drawSheetName('military_gdp', 'SELECT A,B,C', militarySpendingResponseHandler); 
+            drawSheetName('spend_change_value', 'SELECT A,B', topHealthValueResponseHandler);
+            drawSheetName('health_percent_change', 'SELECT A,B', topHealthPercentValueResponseHandler);
+            drawSheetName('education_change', 'SELECT A,B', topEducPercentValueResponseHandler);    
+    
+        } //drawAllSheets
+
+        function drawSheetName(sheetName, query, responseHandler) {
+            var queryString = encodeURIComponent(query);
+            var query = new google.visualization.Query(
+                'https://docs.google.com/spreadsheets/d/1y4bDmpxzD0QFU5tzeE85SeIudczpFIXJoReu60dyBRg/gviz/tq?sheet=' 
+                        + sheetName + '&headers=1&tq=' + queryString); //Query
+            query.send(responseHandler);
+        } //drawSheetName
+
+        function bubbleChartResponseHandler(response) {
+            var data = response.getDataTable();
+            data.sort({column: 4, desc: true});
+
+        var options = {
+            title: 'Correlation between education spending, GDP ' +
+                'and population of G20 countries (2018)',
+            hAxis: {title: 'Education Spending'},
+            vAxis: {title: 'GDP'},
+            bubble: {textStyle: {fontSize: 11}}      };
+
+        var chart = new google.visualization.BubbleChart(document.getElementById('series_chart_div'));
+        chart.draw(data, options);
+        }
+    
+        function topSharedGDPResponseHandler(response) {
+            var data = response.getDataTable();
+            
+            var options = {
+                legend: 'none',
+                bars: 'horizontal',
+                annotations: {alwaysOutside: true},
+                title: 'G20 Countries by Education Spending as % of GDP 2018',
+                vAxis: {title: 'Country'},
+                hAxis: {title: '%'}
+            };
+
+            var view = new google.visualization.DataView(data);
+            view.setColumns([0,1, {
+                calc: function(dt, row) {
+                    return Math.ceil(dt.getFormattedValue(row, 1)) + '%';
+                },
+                sourceColumn: 1,
+                type: 'string',
+                role: 'annotation'
+            }]);
+
+            var chart = new google.visualization.BarChart(document.getElementById('top_shared_gdp_div'));
+
+            chart.draw(view, options);
+            
+        } 
+        function bubbleChartMilResponseHandler(response) {
+            var data = response.getDataTable();
+            data.sort({column: 4, desc: true});
+
+        var options = {
+            title: 'Correlation between Military spending, GDP ' +
+                'and population of G20 countries (2018)',
+            hAxis: {title: 'Military Spending'},
+            vAxis: {title: 'GDP'},
+            bubble: {textStyle: {fontSize: 11}}      };
+
+        var chart = new google.visualization.BubbleChart(document.getElementById('series_mil_div'));
+        chart.draw(data, options);
+        }
+
+        function topSharedMilitaryResponseHandler(response) {
+            var data = response.getDataTable();
+            
+            var options = {
+                legend: 'none',
+                bars: 'horizontal',
+                annotations: {alwaysOutside: true},
+                title: 'G20 Countries by Military Spending as % of GDP 2018',
+                vAxis: {title: 'Country'},
+                hAxis: {title: '%'}
+                        
+              
+            };
+
+            var view = new google.visualization.DataView(data);
+            view.setColumns([0,1, {
+                calc: function(dt, row) {
+                    return Math.ceil(dt.getFormattedValue(row, 1)) + '%';
+                },
+                sourceColumn: 1,
+                type: 'string',
+                role: 'annotation'
+            }]);
+
+            var chart = new google.visualization.BarChart(document.getElementById('top_shared_mil_div'));
+
+            chart.draw(view, options);
+            
+        } 
+        function topHealthSpendingResponseHandler(response) {
+            var data = response.getDataTable();
+            data.sort({column: 1, desc:true});
+
+            var options = {
+                colorAxis : {colors: ['#FFB6C1', '#4374e0']},
+                title: 'Health Spending as % of GDP'
+            };
+
+            var chart = new google.visualization.GeoChart(document.getElementById('top_health_spending_div'));
+
+            chart.draw(data, options);
+        }
+        function healthSpendingResponseHandler(response) {
+            var data = response.getDataTable();
+            data.sort({column: 2, desc: true});
+
+            var options = {
+                vAxis: {title: 'Spending ($)'},
+                hAxis: {title: 'Country'}
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById("health_spending_div"));
+
+            chart.draw(data, options);
+        } 
+        function militarySpendingResponseHandler(response) {
+            var data = response.getDataTable();
+            data.sort({column: 2, desc: true});
+
+            var options = {
+                vAxis: {title: 'Spending ($)'},
+                hAxis: {title: 'Country'}
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById("military_spending_div"));
+
+            chart.draw(data, options);
+        } 
+        function topHealthValueResponseHandler(response) {
+            var data = response.getDataTable();
+            
+            var options = {
+                legend: 'none',
+                bars: 'horizontal',
+                annotations: {alwaysOutside: true},
+                title: 'G20 Countries by Change in Per Capita Health Spending (2009-2017)',
+                vAxis: {title: 'Country'},
+                hAxis: {title: '$'}
+            };
+
+            var view = new google.visualization.DataView(data);
+            view.setColumns([0,1, {
+                calc: function(dt, row) {
+                    return Math.ceil(dt.getFormattedValue(row, 1)) + '$';
+                },
+                sourceColumn: 1,
+                type: 'string',
+                role: 'annotation'
+            }]);
+
+            var chart = new google.visualization.BarChart(document.getElementById('top_health_value_div'));
+
+            chart.draw(view, options);
+            
+        } 
+        function topHealthPercentValueResponseHandler(response) {
+            var data = response.getDataTable();
+            
+            var options = {
+                legend: 'none',
+                bars: 'horizontal',
+                annotations: {alwaysOutside: true},
+                title: 'G20 Countries by Change in Per Capita Health Spending (2009-2017)',
+                vAxis: {title: 'Country'},
+                hAxis: {title: '%'}
+            };
+
+            var view = new google.visualization.DataView(data);
+            view.setColumns([0,1, {
+                calc: function(dt, row) {
+                    return Math.ceil(dt.getFormattedValue(row, 1)) + '%';
+                },
+                sourceColumn: 1,
+                type: 'string',
+                role: 'annotation'
+            }]);
+
+            var chart = new google.visualization.BarChart(document.getElementById('top_health_percent_div'));
+
+            chart.draw(view, options);
+            
+        } 
+        function topEducPercentValueResponseHandler(response) {
+            var data = response.getDataTable();
+            
+            var options = {
+                legend: 'none',
+                bars: 'horizontal',
+                annotations: {alwaysOutside: true},
+                title: 'G20 Countries by Change in Per Capita Health Spending (2009-2017)',
+                vAxis: {title: 'Country'},
+                hAxis: {title: '%'}
+            };
+
+            var view = new google.visualization.DataView(data);
+            view.setColumns([0,1, {
+                calc: function(dt, row) {
+                    return Math.ceil(dt.getFormattedValue(row, 1)) + '%';
+                },
+                sourceColumn: 1,
+                type: 'string',
+                role: 'annotation'
+            }]);
+
+            var chart = new google.visualization.BarChart(document.getElementById('top_educ_percent_div'));
+
+            chart.draw(view, options);
+            
+        } 
+        </script>
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+    
+    </head>
+    <body id="page-top">
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+            <a class="navbar-brand js-scroll-trigger" href="#page-top"
+                ><span class="d-block d-lg-none">Cate Lee, DATS 6401 Project 1 </span></a
+            ><button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#introduction">Introduction</a></li>
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#visualizations">Visualizations</a></li>
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#conclusion">Conclusion</a></li>
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#works_cited">Works Cited</a></li>
+                </ul>
+            </div>
+        </nav>
+        <!-- Page Content-->
+        <div class="container-fluid p-0">
+            <!-- Introduction-->
+            <section class="resume-section" id="introduction">
+                <div class="resume-section-content">
+                    <h1 class="mb-0">Expenditure Analysis: <span class="text-primary">G20 Countries</span></h1>
+                    <div class="subheading mb-5">Data Source: The World Bank World Development Indicators Database </div>
+                    <p class="lead mb-5">This project will compare the education, healthcare and military spending of the G20 countries. Data from 2009 to 2018 from the World Bank will be visualized to show the relationships between various types of spending and GDP.</p>
+                    <p class="lead mb-5">Analyzing a countries focus on investment in education, healthcare and the military can indicate it's policy priorities, but often reveals shortcomings in meeting these priorities. This analysis will focus in particular on the US's spending and how it compares with the US's current rising healthcare costs and student debt. Significant trends and patterns in other countries will also be noted.</p>
+                </div>
+            </section>
+            <hr class="m-0" />
+            <!-- Visualizations-->
+                    <h2 class="mb-5" id="visualizations">Visualizations</h2>
+                    <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                        <div class="flex-grow-1">
+                            <p class="lead mb-5">A countries overall education spending should be indicative of the quality of it's education system, however this is not always be the case. The following bubble chart
+                                will help us examine the relationship between GDP and education spending, while also noting the regions and populations of each country.
+                            </p>
+                            <h3 class="mb-0">Education Spending, GDP and Population</h3>
+                            <h3>G20 Countries</h3>
+                            <div id="series_chart_div" style="width: 900px; height: 500px;"></div>
+                            <p class="lead mb-5">From this chart we can see easily that the US, China and India have the largest populations. More interestingly, we can see how much money each country spends on education relative to GDP. 
+                                Countries that lie on a steeper plane devote comparatively less, while countries on a flat plane devote more. For example, while the US has a GDP less than twice the size of China's, they devote about 5 times the resources to education. This suggests that the US does not allocate it's resources efficiently,
+                                as US students take on thousands of dollars in student loan debt each year. We can see the difference in focus on education between the US and China even more clearly in the following bar chart.
+                                
+                            </p>
+                            <h3>Top Education Spending as % of GDP in 2018</h3>
+                            <div id="top_shared_gdp_div" style="width: 900px; height:700px;"></div>
+                            <p class="lead mb-5">So in 2018, the US devoted 3% more, comparative to it's GDP than China. Other interesting details are visible that were obscured in the bubble chart. For example, Brazil and South Africa devote the largest portions of spending towards education at about 7% each.
+                                
+                            </p>
+                            <h3 class="mb-0">Military Spending, GDP and Population</h3>
+                            <h3>G20 Countries</h3>
+                            <div id="series_mil_div" style="width: 900px; height: 500px;"></div>
+                            <p class="lead mb-5">Examining a similar chart for military spending, we can see that China has moved slightly out to the right, meaning they spend relatively more on military. We can also see that Japan has moved slightly left and up, meaning they spend relatively less on military than on education.
+                                Of note is that no overall education spending data was available for the European Union, and so this point cannot be compared to the first bubble chart on education spending.
+                            </p>
+                            <h3>Top Military Spending as % of GDP in 2018</h3>
+                            <div id="top_shared_mil_div" style="width: 900px; height:700px;"></div>
+                            <p class="lead mb-5">The countries allocating the most resources towards military are Saudi Arabia, Russia and the US, while countries like India and Mexico only devote around 1%</p>
+                            <h3>Health Spending as % of GDP (2018)</h3>
+                            <div id="top_health_spending_div" style="width: 900px; height:500px;"></div>
+                            <p>Looking at healthcare spending as a percent of GDP, we can see that countries like the US and Japan are the most resource-intensive, while countries like India and Mexico devote a smaller portion. It brings to question why Americans face such steep and rising healthcare costs, despite heavy government investment.</p>
+                            <h3>Health Expenditure Per Capita and GDP Per Capita for Top 20 Countries</h3>
+                            <div id="health_spending_div" style="width: 900px; height: 500px;"></div>
+                            <p>Healthcare spending per capita tells a simlar story. Countries like the US, Canada and Australia devote relatively more money to healthcare. In contrast, India or Mexico devotes a small portion.</p>
+                            <h3>Military Expenditure Per Capita and GDP Per Capita for Top 20 Countries</h3>
+                            <div id="military_spending_div" style="width: 900px; height: 500px;"></div>
+                            <p>Data for this portion was extrapolated from overall military spending and population data, as military spending per capita was unavailable. We can still see the repeated pattern of higher military spending in Saudi Arabia and the US.</p>
+                            <h3>Top Increase in Healthcare Spend Per Capita (2009-2017)</h3>
+                            <div id="top_health_value_div" style="width: 900px; height:700px;"></div>
+                            <p>Here are the largest increases in per capita spend on healthcare between 2009 and 2017. The US has the highest increase, however this may skewed by the size of the population. We should also consider the change in percent of spending allocated to healthcare.</p>
+                            <h3>Top Percentage Increase in Healthcare Spend (2009-2017)</h3>
+                            <div id="top_health_percent_div" style="width: 900px; height:700px;"></div>
+                            <p>The percentage increase tells a rather different story. Here we can see that Japan, Saudi Arabia and Korea have been increasing the share of their spending towards healthcare during this time period.</p>
+                            <h3>Top Percentage Increase in Education Spend (2009-2017)</h3>
+                            <div id="top_educ_percent_div" style="width: 900px; height:700px;"></div>
+                            <p>Data on change in education spending was very limited in this period, with these three countries having the most complete data. All three have a very small 1% increase in share of spending allocated to education.</p>
+                    </div>
+                </div>
+            </section>
+            <hr class="m-0" />
+            <!--Conclusion-->
+            <section class="resume-section" id="conclusion">
+                <div class="resume-section-content">
+                    <h2 class="mb-5">Conclusion</h2>
+                    <p class="lead mb-5">In conclusion, a country's spending on a particular category doesn't necessarily translate to better education, healthcare or military services. The US tends to be a top spender in every category, and particularly in military. Saudi Arabia and Russia show more interest in military development, while Brazil and South Africa devote resources towards education. Countries like Japan and Korea spend a moderate amount on healthcare but show are slowly increasing their spending in recent years. </p>
+
+                    </div>
+                </div>
+           
+            <hr class="m-0" />
+
+            
+            </section>
+            <hr class="m-0" />
+            <!-- Works Cited-->
+            <section class="resume-section" id="works_cited">
+                <div class="resume-section-content">
+                    <h2 class="mb-5">Works Cited</h2>
+                    <p class="lead mb-5">Data Source: https://databank.worldbank.org/source/world-development-indicators/preview/</p>
+                </div>
+            </section>
+        </div>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+        <!-- Third party plugin JS-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+    </body>
+</html>
